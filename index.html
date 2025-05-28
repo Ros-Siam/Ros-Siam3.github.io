@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
@@ -153,7 +153,7 @@
   </div>
 
   <script>
-    const apiUrl = `https://script.google.com/macros/s/AKfycbwW7ic9Ieq4bvk93B-C2XCGaU4ovLCF5VB-hW7Uxzn8XgluS_WpAFOQJ3x18UpmUx3P7g/exec`;
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbwW7ic9Ieq4bvk93B-C2XCGaU4ovLCF5VB-hW7Uxzn8XgluS_WpAFOQJ3x18UpmUx3P7g/exec';
 
     const grabLogo = 'https://drive.google.com/thumbnail?id=1vhOumfzWD7xseUY1YMqfHab7fdbln_Mg';
     const linemanLogo = 'https://drive.google.com/thumbnail?id=1WmMY7RkgnNNJBMLiid2OMevP0d4a-Dgq';
@@ -170,8 +170,8 @@
         ready.innerHTML = '';
 
         data.forEach(row => {
-          const orderNumber = row["กำลังเตรียมอาหาร"]?.trim();
-          const readyNumber = row["พร้อมส่ง"]?.trim();
+          const orderNumber = row.preparing?.trim();
+          const readyNumber = row.ready?.trim();
 
           if (orderNumber) {
             const logo = orderNumber.length === 3 ? grabLogo : linemanLogo;
