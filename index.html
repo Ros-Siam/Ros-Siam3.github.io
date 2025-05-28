@@ -106,6 +106,21 @@
       transform: translateX(-50%);
     }
 
+    .input-section {
+      width: 100%;
+      padding: 15px 20px;
+      text-align: center;
+    }
+
+    .input-section input {
+      font-size: 1.5rem;
+      padding: 8px 15px;
+      border: 2px solid #a52a2a;
+      border-radius: 10px;
+      width: 200px;
+      text-align: center;
+    }
+
     @media (max-width: 768px) {
       .orders {
         grid-template-columns: repeat(2, 1fr);
@@ -132,6 +147,10 @@
     <h1>ขาหมู รสสยาม</h1>
   </header>
 
+  <div class="input-section">
+    <input type="text" id="orderInput" placeholder="พิมพ์เลขออเดอร์ แล้วกด Enter" />
+  </div>
+
   <div class="container">
     <div class="divider"></div>
 
@@ -153,43 +172,52 @@
   </div>
 
   <script>
-    const apiUrl = 'https://script.google.com/macros/s/AKfycbwW7ic9Ieq4bvk93B-C2XCGaU4ovLCF5VB-hW7Uxzn8XgluS_WpAFOQJ3x18UpmUx3P7g/exec';
-
     const grabLogo = 'https://drive.google.com/thumbnail?id=1vhOumfzWD7xseUY1YMqfHab7fdbln_Mg';
     const linemanLogo = 'https://drive.google.com/thumbnail?id=1WmMY7RkgnNNJBMLiid2OMevP0d4a-Dgq';
 
-    async function fetchData() {
-      try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
+    let preparingList = JSON.parse(localStorage.getItem('preparing')) || [];
+    let readyList = JSON.parse(localStorage.getItem('ready')) || [];
 
-        const preparing = document.getElementById('preparing');
-        const ready = document.getElementById('ready');
+    const orderInput = document.getElementById('orderInput');
+    const preparingDiv = document.getElementById('preparing');
+    const readyDiv = document.getElementById('ready');
 
-        preparing.innerHTML = '';
-        ready.innerHTML = '';
-
-        data.forEach(row => {
-          const orderNumber = row.preparing?.trim();
-          const readyNumber = row.ready?.trim();
-
-          if (orderNumber) {
-            const logo = orderNumber.length === 3 ? grabLogo : linemanLogo;
-            preparing.innerHTML += `<div class="order-row"><img src="${logo}" /><span class="order-number">${orderNumber}</span></div>`;
-          }
-
-          if (readyNumber) {
-            const logo = readyNumber.length === 3 ? grabLogo : linemanLogo;
-            ready.innerHTML += `<div class="order-row"><img src="${logo}" /><span class="order-number">${readyNumber}</span></div>`;
-          }
-        });
-      } catch (err) {
-        console.error('Error fetching data:', err);
-      }
+    function render() {
+      preparingDiv.innerHTML = '';
+      readyDiv.innerHTML = '';
+      preparingList.forEach(order => {
+        const logo = order.length === 3 ? grabLogo : linemanLogo;
+        preparingDiv.innerHTML += `<div class="order-row"><img src="${logo}" /><span class="order-number">${order}</span></div>`;
+      });
+      readyList.forEach(order => {
+        const logo = order.length === 3 ? grabLogo : linemanLogo;
+        readyDiv.innerHTML += `<div class="order-row"><img src="${logo}" /><span class="order-number">${order}</span></div>`;
+      });
     }
 
-    fetchData();
-    setInterval(fetchData, 3000);
+    orderInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        const value = orderInput.value.trim();
+        if (!value) return;
+
+        if (!preparingList.includes(value) && !readyList.includes(value)) {
+          preparingList.push(value);
+        } else if (preparingList.includes(value)) {
+          preparingList = preparingList.filter(v => v !== value);
+          readyList.push(value);
+        } else if (readyList.includes(value)) {
+          readyList = readyList.filter(v => v !== value);
+        }
+
+        localStorage.setItem('preparing', JSON.stringify(preparingList));
+        localStorage.setItem('ready', JSON.stringify(readyList));
+
+        orderInput.value = '';
+        render();
+      }
+    });
+
+    render();
   </script>
 </body>
 </html>
