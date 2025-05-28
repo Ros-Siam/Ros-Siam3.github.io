@@ -23,6 +23,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     header img {
@@ -34,6 +35,20 @@
       font-size: 3rem;
       margin: 0;
       font-family: 'TH Sarabun New', sans-serif;
+    }
+
+    .input-area {
+      margin: 15px auto 0;
+      text-align: center;
+    }
+
+    .input-area input {
+      font-size: 1.5rem;
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: 1px solid #aaa;
+      width: 240px;
+      text-align: center;
     }
 
     .container {
@@ -106,21 +121,6 @@
       transform: translateX(-50%);
     }
 
-    .input-section {
-      width: 100%;
-      padding: 15px 20px;
-      text-align: center;
-    }
-
-    .input-section input {
-      font-size: 1.5rem;
-      padding: 8px 15px;
-      border: 2px solid #a52a2a;
-      border-radius: 10px;
-      width: 200px;
-      text-align: center;
-    }
-
     @media (max-width: 768px) {
       .orders {
         grid-template-columns: repeat(2, 1fr);
@@ -147,8 +147,8 @@
     <h1>ขาหมู รสสยาม</h1>
   </header>
 
-  <div class="input-section">
-    <input type="text" id="orderInput" placeholder="พิมพ์เลขออเดอร์ แล้วกด Enter" />
+  <div class="input-area">
+    <input type="text" id="orderInput" placeholder="พิมพ์เลขออเดอร์ แล้วกด Enter">
   </div>
 
   <div class="container">
@@ -175,49 +175,52 @@
     const grabLogo = 'https://drive.google.com/thumbnail?id=1vhOumfzWD7xseUY1YMqfHab7fdbln_Mg';
     const linemanLogo = 'https://drive.google.com/thumbnail?id=1WmMY7RkgnNNJBMLiid2OMevP0d4a-Dgq';
 
-    let preparingList = JSON.parse(localStorage.getItem('preparing')) || [];
-    let readyList = JSON.parse(localStorage.getItem('ready')) || [];
+    let preparingOrders = JSON.parse(localStorage.getItem('preparingOrders')) || [];
+    let readyOrders = JSON.parse(localStorage.getItem('readyOrders')) || [];
 
-    const orderInput = document.getElementById('orderInput');
-    const preparingDiv = document.getElementById('preparing');
-    const readyDiv = document.getElementById('ready');
+    function renderOrders() {
+      const preparing = document.getElementById('preparing');
+      const ready = document.getElementById('ready');
 
-    function render() {
-      preparingDiv.innerHTML = '';
-      readyDiv.innerHTML = '';
-      preparingList.forEach(order => {
+      preparing.innerHTML = '';
+      ready.innerHTML = '';
+
+      preparingOrders.forEach(order => {
         const logo = order.length === 3 ? grabLogo : linemanLogo;
-        preparingDiv.innerHTML += `<div class="order-row"><img src="${logo}" /><span class="order-number">${order}</span></div>`;
+        preparing.innerHTML += `<div class="order-row"><img src="${logo}" /><span class="order-number">${order}</span></div>`;
       });
-      readyList.forEach(order => {
+
+      readyOrders.forEach(order => {
         const logo = order.length === 3 ? grabLogo : linemanLogo;
-        readyDiv.innerHTML += `<div class="order-row"><img src="${logo}" /><span class="order-number">${order}</span></div>`;
+        ready.innerHTML += `<div class="order-row"><img src="${logo}" /><span class="order-number">${order}</span></div>`;
       });
     }
 
-    orderInput.addEventListener('keypress', e => {
+    document.getElementById('orderInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        const value = orderInput.value.trim();
+        const value = e.target.value.trim();
         if (!value) return;
 
-        if (!preparingList.includes(value) && !readyList.includes(value)) {
-          preparingList.push(value);
-        } else if (preparingList.includes(value)) {
-          preparingList = preparingList.filter(v => v !== value);
-          readyList.push(value);
-        } else if (readyList.includes(value)) {
-          readyList = readyList.filter(v => v !== value);
+        const indexPrep = preparingOrders.indexOf(value);
+        const indexReady = readyOrders.indexOf(value);
+
+        if (indexPrep === -1 && indexReady === -1) {
+          preparingOrders.push(value);
+        } else if (indexPrep !== -1) {
+          preparingOrders.splice(indexPrep, 1);
+          readyOrders.push(value);
+        } else if (indexReady !== -1) {
+          readyOrders.splice(indexReady, 1);
         }
 
-        localStorage.setItem('preparing', JSON.stringify(preparingList));
-        localStorage.setItem('ready', JSON.stringify(readyList));
-
-        orderInput.value = '';
-        render();
+        localStorage.setItem('preparingOrders', JSON.stringify(preparingOrders));
+        localStorage.setItem('readyOrders', JSON.stringify(readyOrders));
+        e.target.value = '';
+        renderOrders();
       }
     });
 
-    render();
+    renderOrders();
   </script>
 </body>
 </html>
