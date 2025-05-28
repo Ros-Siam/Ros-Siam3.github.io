@@ -23,8 +23,6 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 15px;
-        flex-wrap: wrap;
         position: relative;
       }
 
@@ -35,22 +33,31 @@
       header h1 {
         margin: 0;
         font-size: 1.5rem;
-        flex-grow: 1;
+      }
+
+      .input-container {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      .input-container label {
+        font-size: 0.8rem;
+        margin-bottom: 3px;
       }
 
       #orderInput {
-        font-size: 1.2rem;
-        padding: 6px 10px;
-        width: 180px;
+        font-size: 1rem;
+        padding: 4px 8px;
+        width: 80px;
         border: 2px solid white;
         border-radius: 8px;
         outline: none;
         font-family: 'Kanit', sans-serif;
         color: #333;
-      }
-
-      #orderInput:focus {
-        border-color: #ffc;
       }
 
       main {
@@ -92,7 +99,10 @@
     <header>
       <img src="https://drive.google.com/thumbnail?id=1fjf65qn08ihSykXBZOOFQJJzFevHGjMh" alt="logo" />
       <h1>ขาหมู รสสยาม</h1>
-      <input id="orderInput" type="text" autocomplete="off" maxlength="10" />
+      <div class="input-container">
+        <label for="orderInput">order</label>
+        <input id="orderInput" type="text" autocomplete="off" maxlength="10" />
+      </div>
     </header>
 
     <main>
@@ -108,7 +118,6 @@
 
     <!-- Firebase SDKs -->
     <script type="module">
-      // Firebase
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import {
         getFirestore,
@@ -150,14 +159,11 @@
           const readySnap = await getDoc(readyDoc);
 
           if (prepSnap.exists()) {
-            // Move to ready
             await deleteDoc(prepDoc);
             await setDoc(readyDoc, { timestamp: Date.now() });
           } else if (readySnap.exists()) {
-            // Remove from ready
             await deleteDoc(readyDoc);
           } else {
-            // Add to preparing
             await setDoc(prepDoc, { timestamp: Date.now() });
           }
         }
